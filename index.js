@@ -288,7 +288,7 @@ app.get("/stories/:email", async (req, res) => {
 });
 
 app.get('/randomStories', async (req, res) => {
-  const result = await storyCollection.aggregate([{ $sample: { size: 4 } }]).toArray();
+  const result = await storyCollection.aggregate([{ $sample: { size: 2 } }]).toArray();
   res.send(result);
 });
 
