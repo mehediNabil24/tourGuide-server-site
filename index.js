@@ -175,6 +175,12 @@ async function run() {
       const result = await PackageCollection.find().toArray();
       res.send(result)
   })
+
+  app.get('/randomPackages', async (req, res) => {
+    const result = await PackageCollection.aggregate([{ $sample: { size: 3 } }]).toArray();
+    res.send(result);
+  });
+
   app.get("/packageDetails/:id", async (req, res) => {
     const id = req.params.id;
     const query = { _id: new ObjectId(id) };
@@ -417,7 +423,7 @@ run().catch(console.dir);
 
 
 app.get('/', (req,res)=>{
-    res.send("tourism is running")
+    res.send("tourism is running me")
 })
 
 app.listen(port, ()=>{
