@@ -33,6 +33,7 @@ async function run() {
     const tourGuideCollection = client.db('tourismDb').collection('tourGuides');
     const storyCollection = client.db('tourismDb').collection('stories');
     const bookingCollection = client.db('tourismDb').collection('bookings');
+    const reviewsCollection = client.db('tourismDb').collection('reviews');
     // Connect the client to the server	(optional starting in v4.7)
     // await client.connect();
     // // Send a ping to confirm a successful connection
@@ -139,7 +140,7 @@ async function run() {
     app.put("/users/:email", async (req, res) => {
       const email = req.params.email;
       const { name, image } = req.body;
-      const result =await userCollection.updateOne({ email }, { $set: { name, image } });
+      const result =await userCollection.updateOne({ email }, { $set: { name, photo } });
       res.send(result)
     });
 
@@ -405,6 +406,68 @@ app.delete("/bookings/:id", async (req, res) => {
     res.status(500).send({ error: "Failed to cancel booking" });
   }
 });
+
+
+app.post('/reviews',async(req,res)=>{
+  const item =req.body;
+  const result = await reviewsCollection.insertOne(item);
+  res.send(result);
+ 
+})
+
+app.get('/allReviews', async(req,res)=>{
+  const result = await reviewsCollection.find().toArray();
+  res.send(result)
+})
+
+
+app.get('/reviews/:id', async (req, res) => {
+  try {
+      const { id } = req.params;  // Image ID from the request parameter
+
+    
+
+      // Query to find all comments related to the Id
+      const query = { tourId: id }; 
+      const result = await reviewsCollection
+          .find(query)
+          .sort({ createdAt: -1 })  // Sort by newest comments first
+          .toArray();
+
+      res.send(result);
+  } catch (err) {
+      console.error(err);
+      
+  }
+});
+
+//  // stats or analytics 
+//  app.get('/admin-stats', async(req,res)=>{
+//   const users = await userCollection.estimatedDocumentCount();
+//   const bookings = await bookingCollection.estimatedDocumentCount();
+//   const tour_guide = await tourGuideCollection.estimatedDocumentCount();
+//   const story = await storyCollection.estimatedDocumentCount();
+//   // const orders = await paymentCollection.estimatedDocumentCount();
+//   // const result = await paymentCollection.aggregate([
+//   //  {
+//   //   $group: {
+//   //     _id: null,
+//   //     totalRevenue: {
+//   //       $sum: "price"
+
+//   //     }
+//   //   }
+//   //  }
+//   // ]).toArray();
+//   // const revenue = result.length > 0? result[0].totalRevenue: 0;
+//   res.send({
+//     users,tour_guide, story, bookings
+//   })
+// })
+
+
+
+
 
 
 
